@@ -1,2 +1,2 @@
-# no-names-lyrics
-basically uhh this is me trying lyric syncronization for ivLyrics
+# no name's lyrics
+a very specific lyric provider (first time trying lyric syncronization)
