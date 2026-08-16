@@ -1,0 +1,9 @@
+{
+  "id": "no-names-lyrics",
+  "name": "no name's lyrics",
+  "version": "1.0.0",
+  "description": "someone's attempt at lyric syncronization",
+  "author": "blasieuwu",
+  "type": "lyric-provider",
+  "entry": "https://raw.githubusercontent.com/blasieuwu/no-names-lyrics/main/index.js"
+}
