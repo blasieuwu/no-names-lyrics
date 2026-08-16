@@ -1,9 +1,17 @@
 {
-  "id": "no-names-lyrics",
-  "name": "no name's lyrics",
-  "version": "1.0.0",
-  "description": "someone's attempt at lyric syncronization",
-  "author": "blasieuwu",
-  "type": "lyric-provider",
-  "entry": "https://raw.githubusercontent.com/blasieuwu/no-names-lyrics/main/index.js"
+  "addons": [
+    {
+      "name": "no name's lyrics",
+      "type": "lyrics",
+      "author": "blasieuwu",
+      "version": "1.0.0",
+      "updated": "2026-08-16",
+      "description": {
+        "en": "someone's attempt at lyric syncronization"
+      },
+      "githubUrl": "https://github.com/blasieuwu/no-names-lyrics",
+      "downloadUrl": "https://raw.githubusercontent.com/blasieuwu/no-names-lyrics/main/index.js",
+      "minAppVersion": "1.0.0"
+    }
+  ]
 }
