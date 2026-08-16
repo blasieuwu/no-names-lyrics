@@ -11,22 +11,21 @@
  */
 
 (() => {
-  // clean slugification: removes punctuation cleanly first
+  // clean slugification
   function slugify(str) {
     return (str || "")
       .toLowerCase()
-      .replace(/[^\w\s-]/g, "") // remove punctuation like commas
+      .replace(/[^\w\s-]/g, "") // remove punctuation
       .trim()
-      .replace(/[\s_]+/g, "_"); // replace spaces with single underscore
+      .replace(/[\s_]+/g, "_"); // replace spaces with underscore
   }
 
-  // helper to parse LRC format timestamp [mm:ss.xx] into milliseconds
+  // helper to parse LRC format timestamp [mm:ss.xx] into milliseconds & seconds
   function parseLrc(lrcText) {
     const lines = lrcText.split("\n");
     const syncedLyrics = [];
     const plainLyricsArr = [];
 
-    // regex to capture [mm:ss.xx] or [mm:ss:xx] and lyric text
     const timeRegex = /\[(\d{2}):(\d{2})[.:](\d{2,3})\](.*)/;
 
     for (const line of lines) {
@@ -40,6 +39,7 @@
 
         syncedLyrics.push({
           time: timeMs,
+          startTimeMs: timeMs,
           text: text
         });
         if (text) plainLyricsArr.push(text);
@@ -74,42 +74,74 @@
     },
 
     async getLyrics(info) {
-      if (!info || !info.title) return null;
+      console.log("[no name's lyrics] getLyrics called with info:", info);
+
+      if (!info) return null;
+
+      // extract title and artist from potential metadata paths
+      const rawTitle = info.title || info.name || info.metadata?.title || "";
+      const rawArtist = info.artist || info.artists?.[0]?.name || info.metadata?.artist || "";
+
+      if (!rawTitle) {
+        console.warn("[no name's lyrics] missing track title");
+        return null;
+      }
 
       const repoBase = "https://raw.githubusercontent.com/blasieuwu/no-names-lyrics/main/lyrics";
       
-      const titleSlug = slugify(info.title);
-      const artistSlug = slugify(info.artist);
+      const titleSlug = slugify(rawTitle);
+      const artistSlug = slugify(rawArtist);
 
       const lrcFilename = `${titleSlug}-${artistSlug}.lrc`;
-      const lrcUrl = `${repoBase}/${lrcFilename}?t=${Date.now()}`; // bypass raw github cache
+      const jsonFilename = `${titleSlug}-${artistSlug}.json`;
 
-      console.log("[no name's lyrics] fetching:", lrcUrl);
+      const lrcUrl = `${repoBase}/${lrcFilename}?t=${Date.now()}`;
+      console.log("[no name's lyrics] fetching URL:", lrcUrl);
 
       try {
+        // try fetching .lrc first
         const lrcRes = await fetch(lrcUrl);
+        console.log("[no name's lyrics] fetch status:", lrcRes.status);
+
         if (lrcRes.ok) {
           const lrcText = await lrcRes.text();
           const parsed = parseLrc(lrcText);
 
-          console.log("[no name's lyrics] successfully loaded parsed lyrics:", parsed);
+          console.log("[no name's lyrics] parsed lrc successfully:", parsed);
 
           return {
             isError: false,
             result: {
-              title: info.title,
-              artist: info.artist,
-              syncedType: "line",
+              title: rawTitle,
+              artist: rawArtist,
+              syncedType: "LINE",
               syncedLyrics: parsed.syncedLyrics,
-              lines: parsed.syncedLyrics, // redundant mapping for ivlyrics schema compatibility
+              lines: parsed.syncedLyrics,
               plainLyrics: parsed.plainLyrics,
               provider: "no name's lyrics"
             }
           };
-        } else {
-          console.warn("[no name's lyrics] file not found (404):", lrcFilename);
         }
 
+        // fallback to json
+        const jsonRes = await fetch(`${repoBase}/${jsonFilename}?t=${Date.now()}`);
+        if (jsonRes.ok) {
+          const data = await jsonRes.json();
+          return {
+            isError: false,
+            result: {
+              title: data.title || rawTitle,
+              artist: data.artist || rawArtist,
+              syncedType: data.syncedType || "LINE",
+              syncedLyrics: data.syncedLyrics || data.lines,
+              lines: data.lines || data.syncedLyrics,
+              plainLyrics: data.plainLyrics,
+              provider: "no name's lyrics"
+            }
+          };
+        }
+
+        console.warn("[no name's lyrics] no matching lyrics file found on github");
         return null;
       } catch (err) {
         console.error("[no name's lyrics] fetch error:", err);
