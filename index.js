@@ -1,9 +1,10 @@
 /**
  * @addon-type lyrics
+ * @id no-names-lyrics
  * @name no name's lyrics
- * @description someone's attempt at lyric syncronization
  * @version 1.0.0
  * @author blasieuwu
+ * @description someone's attempt at lyric syncronization
  * @supports karaoke: false
  * @supports synced: true
  * @supports unsynced: true
