@@ -11,16 +11,14 @@
  */
 
 (() => {
-  // clean slugification
   function slugify(str) {
     return (str || "")
       .toLowerCase()
-      .replace(/[^\w\s-]/g, "") // remove punctuation
+      .replace(/[^\w\s-]/g, "")
       .trim()
-      .replace(/[\s_]+/g, "_"); // replace spaces with underscore
+      .replace(/[\s_]+/g, "_");
   }
 
-  // helper to parse LRC format timestamp [mm:ss.xx] into milliseconds & seconds
   function parseLrc(lrcText) {
     const lines = lrcText.split("\n");
     const syncedLyrics = [];
@@ -74,16 +72,18 @@
     },
 
     async getLyrics(info) {
-      console.log("[no name's lyrics] getLyrics called with info:", info);
+      console.log("[no name's lyrics] getLyrics received info:", info);
 
-      if (!info) return null;
+      // 1. extract from info or fallback to Spicetify active player track
+      const currentTrack = Spicetify?.Player?.data?.item || Spicetify?.Player?.data?.track;
+      
+      const rawTitle = info?.title || info?.name || info?.metadata?.title || currentTrack?.metadata?.title || currentTrack?.name || "";
+      const rawArtist = info?.artist || info?.artists?.[0]?.name || info?.metadata?.artist || currentTrack?.metadata?.artist_name || currentTrack?.artists?.[0]?.name || "";
 
-      // extract title and artist from potential metadata paths
-      const rawTitle = info.title || info.name || info.metadata?.title || "";
-      const rawArtist = info.artist || info.artists?.[0]?.name || info.metadata?.artist || "";
+      console.log("[no name's lyrics] extracted title/artist:", { rawTitle, rawArtist });
 
       if (!rawTitle) {
-        console.warn("[no name's lyrics] missing track title");
+        console.warn("[no name's lyrics] could not resolve track title");
         return null;
       }
 
@@ -93,13 +93,11 @@
       const artistSlug = slugify(rawArtist);
 
       const lrcFilename = `${titleSlug}-${artistSlug}.lrc`;
-      const jsonFilename = `${titleSlug}-${artistSlug}.json`;
-
       const lrcUrl = `${repoBase}/${lrcFilename}?t=${Date.now()}`;
-      console.log("[no name's lyrics] fetching URL:", lrcUrl);
+
+      console.log("[no name's lyrics] fetching:", lrcUrl);
 
       try {
-        // try fetching .lrc first
         const lrcRes = await fetch(lrcUrl);
         console.log("[no name's lyrics] fetch status:", lrcRes.status);
 
@@ -123,25 +121,7 @@
           };
         }
 
-        // fallback to json
-        const jsonRes = await fetch(`${repoBase}/${jsonFilename}?t=${Date.now()}`);
-        if (jsonRes.ok) {
-          const data = await jsonRes.json();
-          return {
-            isError: false,
-            result: {
-              title: data.title || rawTitle,
-              artist: data.artist || rawArtist,
-              syncedType: data.syncedType || "LINE",
-              syncedLyrics: data.syncedLyrics || data.lines,
-              lines: data.lines || data.syncedLyrics,
-              plainLyrics: data.plainLyrics,
-              provider: "no name's lyrics"
-            }
-          };
-        }
-
-        console.warn("[no name's lyrics] no matching lyrics file found on github");
+        console.warn("[no name's lyrics] file not found (404):", lrcFilename);
         return null;
       } catch (err) {
         console.error("[no name's lyrics] fetch error:", err);
