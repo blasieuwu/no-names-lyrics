@@ -1,14 +1,18 @@
+/**
+ * @name no name's lyrics
+ * @description someone's attempt at lyric syncronization
+ * @author blasieuwu
+ * @version 1.0.0
+ * @type lyric-provider
+ */
+
 module.exports = {
   async getLyrics(info) {
-    // info contains track details from Spotify: title, artist, album, duration
     const title = info.title.toLowerCase();
-    const artist = info.artist.toLowerCase();
-
-    // construct raw github URL for your JSON files
     const repoBase = "https://raw.githubusercontent.com/blasieuwu/no-names-lyrics/main/lyrics";
     
-    // simple slug matching (e.g., "too-little-too-late.json")
-    const filename = title.replace(/[^a-z0-0]/g, "-") + ".json";
+    // matches filenames like "too-little--too-late.json"
+    const filename = title.replace(/[^a-z0-9]/g, "-") + ".json";
 
     try {
       const response = await fetch(`${repoBase}/${filename}`);
