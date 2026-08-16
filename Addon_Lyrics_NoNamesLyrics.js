@@ -55,6 +55,7 @@
     id: "no-names-lyrics",
     name: "no name's lyrics",
     author: "blasieuwu",
+    description: "someone's attempt at lyric syncronization",
     cacheVersion: 1,
 
     init() {
