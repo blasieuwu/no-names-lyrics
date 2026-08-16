@@ -54,6 +54,7 @@
   const NoNamesLyricsAddon = {
     id: "no-names-lyrics",
     name: "no name's lyrics",
+    author: "blasieuwu",
     cacheVersion: 1,
 
     init() {
