@@ -4,7 +4,6 @@
  * @name no name's lyrics
  * @version 1.0.0
  * @author blasieuwu
- * @description someone's attempt at lyric syncronization
  * @supports karaoke: false
  * @supports synced: true
  * @supports unsynced: true
