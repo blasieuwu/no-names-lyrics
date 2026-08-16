@@ -9,6 +9,7 @@
       "description": "https://raw.githubusercontent.com/blasieuwu/no-names-lyrics/main/README.md",
       "githubUrl": "https://github.com/blasieuwu/no-names-lyrics",
       "downloadUrl": "https://raw.githubusercontent.com/blasieuwu/no-names-lyrics/main/Addon_Lyrics_NoNamesLyrics.js",
+      "minAppVersion": "1.0.0"
     }
   ]
 }
