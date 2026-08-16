@@ -56,6 +56,12 @@
     name: "no name's lyrics",
     author: "blasieuwu",
     description: "someone's attempt at lyric syncronization",
+    version: "1.0.0",
+    supports: {
+      karaoke: false,
+      synced: true,
+      unsynced: true
+    },
     cacheVersion: 1,
 
     init() {
