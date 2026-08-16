@@ -1,9 +1,12 @@
 /**
+ * @addon-type lyrics
  * @name no name's lyrics
  * @description someone's attempt at lyric syncronization
- * @author blasieuwu
  * @version 1.0.0
- * @type lyric-provider
+ * @author blasieuwu
+ * @supports karaoke: false
+ * @supports synced: true
+ * @supports unsynced: true
  */
 
 module.exports = {
